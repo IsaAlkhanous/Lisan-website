@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L I S A N</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1) translateX(0); }
+      50% { transform: scale(1.05) translateX(0); }
+    }
+
+    @keyframes pulseShifted {
+      0%, 100% { transform: scale(1) translateX(-150px); }
+      50% { transform: scale(1.05) translateX(-150px); }
+    }
+
+    @keyframes slideInLeft {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    @keyframes messageSlide {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url("Map-0.png");
+      background-color: #413548;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      min-height: 100vh;
+      overflow: hidden;
+      transition: background-image 0.5s ease-in-out;
+    }
+
+    h1 {
+      position: fixed;
+      top: 2rem;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(103,174,112,0.6);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-family: serif;
+      color: #fff;
+      letter-spacing: 0.8rem;
+      animation: fadeIn 1s ease-out, pulse 3s ease-in-out infinite;
+      text-align: center;
+      z-index: 1;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      width: 100%;
+    }
+
+    /* Left Sidebar */
+    #left-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(135deg, rgba(103,174,112,0.8), rgba(103,174,112,0.75));
+      backdrop-filter: blur(10px);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 0;
+    }
+
+    #left-sidebar.open {
+      transform: translateX(0);
+    }
+
+    #menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(103,174,112,0.9), rgba(103,174,112,1));
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 1001;
+    }
+
+    #menu-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(103,174,112,0.5);
+      background: linear-gradient(135deg, rgba(103,174,112,1), rgba(120,190,130,1));
+    }
+
+    #menu-btn img {
+      display: block;
+      filter: brightness(0) invert(1);
+    }
+
+    .sidebar-header {
+      padding: 0 2rem 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .sidebar-header h2 {
+      color: #fff;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0;
+    }
+
+    .nav-item {
+      padding: 1rem 2rem;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-right: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.1);
+      border-right-color: #fff;
+      padding-right: 2.5rem;
+    }
+
+    .nav-item.settings {
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* Settings Overlay */
+    #settings-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInOverlay 0.3s ease;
+    }
+
+    #settings-overlay.open {
+      display: flex;
+    }
+
+    .settings-panel {
+      background: linear-gradient(135deg, rgba(140, 127, 147, 0.95), rgba(140, 127, 147, 0.85));
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: fadeIn 0.4s ease;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .settings-header h2 {
+      color: #fff;
+      font-size: 1.8rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.1);
+      transform: rotate(90deg);
+    }
+
+    .setting-item {
+      margin-bottom: 1.5rem;
+    }
+
+    .setting-item label {
+      display: block;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .setting-item input[type="text"],
+    .setting-item select {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.9);
+      font-size: 1rem;
+    }
+
+    .setting-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Right Chat Sidebar */
+    #chat-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(140, 127, 147, 0.9), rgba(140, 127, 147, 1));
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 999;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    #chat-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(140, 127, 147, 0.5);
+      background: linear-gradient(135deg, rgba(140, 127, 147, 1), rgba(150, 137, 157, 1));
+    }
+
+    #right-sidebar {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 40%;
+      min-width: 450px;
+      height: 100vh;
+      background: linear-gradient(135deg, #24132e, #31203a);
+      backdrop-filter: blur(10px);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 998;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #right-sidebar.open {
+      transform: translateX(0);
+    }
+
+    .chat-header {
+      padding: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      background: rgba(103,174,112,0.95);
+    }
+
+    .chat-header h2 {
+      color: #fff;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    #chat::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #chat::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+    }
+
+    #chat::-webkit-scrollbar-thumb {
+      background: rgba(103,174,112,0.6);
+      border-radius: 10px;
+    }
+
+    #chat::-webkit-scrollbar-thumb:hover {
+      background: rgba(103,174,112,0.8);
+    }
+
+    .message {
+      margin: 0.8rem 0;
+      padding: 12px 16px;
+      border-radius: 15px;
+      max-width: 85%;
+      word-wrap: break-word;
+      animation: messageSlide 0.4s ease-out;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .message:hover {
+      transform: translateY(-2px);
+    }
+
+    .user {
+      text-align: right;
+      color: #fff;
+      background: linear-gradient(135deg, rgba(103, 174, 112, 0.7), rgba(103, 174, 112, 0.5));
+      margin-right: auto;
+      border-bottom-right-radius: 5px;
+    }
+
+    .assistant {
+      text-align: right;
+      color: #fff;
+      background: linear-gradient(135deg, rgba(80, 70, 87, 0.7), rgba(80, 70, 87, 0.5));
+      margin-left: auto;
+      border-bottom-left-radius: 5px;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    #input-area {
+      display: flex;
+      gap: 0.8rem;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      background: rgba(103,174,112,0.1);
+    }
+
+    #input-area input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 15px;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    #input-area input:focus {
+      outline: none;
+      box-shadow: 0 4px 20px rgba(103,174,112,0.4);
+      transform: translateY(-2px);
+    }
+
+    ::placeholder {
+      text-align: right;
+      color: #888;
+    }
+
+    #input-area button {
+      padding: 14px 20px;
+      background: linear-gradient(135deg, rgba(103, 174, 112, 0.9), rgba(103, 174, 112, 1));
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    #input-area button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(103,174,112,0.4);
+      background: linear-gradient(135deg, rgba(103, 174, 112, 1), rgba(120, 190, 130, 1));
+    }
+
+    #input-area button:active {
+      transform: translateY(-1px);
+    }
+
+    /* Dialect Counters */
+    #dialect-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(140, 127, 147, 0.95), rgba(140, 127, 147, 0.85));
+      backdrop-filter: blur(15px);
+      border-radius: 15px 15px 0 0;
+      padding: 0.8rem 1.5rem;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-bottom: none;
+      z-index: 500;
+      animation: fadeIn 1s ease-out;
+      max-width: 90%;
+      width: fit-content;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #dialect-panel.shift-left {
+      margin-right: calc(40.75%);
+      margin-left: auto;
+    }
+
+    .panel-header {
+      text-align: center;
+      color: #fff;
+      font-size: 0.85rem;
+      margin-bottom: 0.6rem;
+      font-weight: bold;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .dialect-grid {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .dialect-counter {
+      background: linear-gradient(135deg, rgba(103,174,112,0.4), rgba(103,174,112,0.35));
+      border-radius: 10px;
+      padding: 0.6rem 0.8rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.1);
+      min-width: 70px;
+    }
+
+    .dialect-counter:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(103,174,112,0.3);
+      background: linear-gradient(135deg, rgba(103,174,112,1), rgba(103,174,112,1));
+    }
+
+    .dialect-counter.active {
+      animation: pulse 0.5s ease;
+      background: linear-gradient(135deg, rgba(103,174,112,0.6), rgba(103,174,112,0.4));
+      border-color: rgba(103,174,112,0.8);
+    }
+
+    .dialect-name {
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05rem;
+    }
+
+    .dialect-count {
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 768px) {
+      #right-sidebar {
+        width: 100%;
+        min-width: unset;
+      }
+
+      #left-sidebar {
+        width: 250px;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        letter-spacing: 0.4rem;
+      }
+
+      .settings-panel {
+        width: 95%;
+        padding: 2rem;
+      }
+
+      #dialect-panel {
+        bottom: 0;
+        padding: 0.6rem 1rem;
+      }
+
+      #dialect-panel.shift-left {
+        margin-right: auto;
+        margin-left: auto;
+      }
+
+      .dialect-grid {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .dialect-counter {
+        padding: 0.5rem 0.6rem;
+        min-width: 60px;
+      }
+
+      .dialect-name {
+        font-size: 0.65rem;
+      }
+
+      .dialect-count {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body id="body">
+  <h1>لـسـا ن</h1>
+  
+  <!-- Menu Button -->
+  <button id="menu-btn">
+    <img src="menu.png" alt="menu" width="20" height="20">
+  </button>
+
+  <!-- Left Sidebar -->
+  <div id="left-sidebar">
+    <div class="sidebar-header">
+      <h2>القائمة</h2>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item">
+        <span>🏠</span>
+        <span>الصفحة الرئيسية</span>
+      </div>
+      <div class="nav-item">
+        <span>💬</span>
+        <span>المحادثات السابقة</span>
+      </div>
+      <div class="nav-item settings" id="settings-btn">
+        <span>⚙️</span>
+        <span>الإعدادات</span>
+      </div>
+      <div class="nav-item">
+        <span>👤</span>
+        <span>تسجيل الدخول</span>
+      </div>
+      <div class="nav-item">
+        <span>ℹ️</span>
+        <span>حول</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Overlay -->
+  <div id="settings-overlay">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <h2>الإعدادات</h2>
+        <button class="close-btn" id="close-settings">✕</button>
+      </div>
+      <div class="setting-item">
+        <label>اسم المستخدم</label>
+        <input type="text" placeholder="أدخل اسمك" value="مستخدم">
+      </div>
+      <div class="setting-item">
+        <label>اللغة</label>
+        <select>
+          <option>العربية</option>
+          <option>English</option>
+          <option>Français</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>النمط</label>
+        <select>
+          <option>داكن</option>
+          <option>فاتح</option>
+          <option>تلقائي</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <div class="checkbox-group">
+          <input type="checkbox" id="notifications" checked>
+          <label for="notifications">تفعيل الإشعارات</label>
+        </div>
+      </div>
+      <div class="setting-item">
+        <div class="checkbox-group">
+          <input type="checkbox" id="sound" checked>
+          <label for="sound">تفعيل الأصوات</label>
+        </div>
+      </div>
+      <div class="setting-item">
+        <div class="checkbox-group">
+          <input type="checkbox" id="animations" checked>
+          <label for="animations">تفعيل الحركات</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Toggle Button -->
+  <button id="chat-toggle">💬 المحادثة</button>
+
+  <!-- Right Chat Sidebar -->
+  <div id="right-sidebar">
+    <div class="chat-header">
+      <h2>المحادثة</h2>
+    </div>
+    <div id="chat"></div>
+    <div id="input-area">
+      <button id="attach">
+        <img src="attach-pic.png" style="width: 20px; height: 20px;" alt="attach">
+      </button>
+      <button id="send">أرسل</button>
+      <input type="text" id="message" placeholder="كيف قد أساعدك اليوم؟" />
+    </div>
+  </div>
+
+  <!-- Dialect Detection Panel -->
+  <div id="dialect-panel">
+    <div class="panel-header">اكتشاف اللهجات</div>
+    <div class="dialect-grid">
+      <div class="dialect-counter" data-dialect="MSA">
+        <div class="dialect-name">MSA</div>
+        <div class="dialect-count">0</div>
+      </div>
+      <div class="dialect-counter" data-dialect="NA">
+        <div class="dialect-name">NA</div>
+        <div class="dialect-count">0</div>
+      </div>
+      <div class="dialect-counter" data-dialect="NILE">
+        <div class="dialect-name">NILE</div>
+        <div class="dialect-count">0</div>
+      </div>
+      <div class="dialect-counter" data-dialect="LEV">
+        <div class="dialect-name">LEV</div>
+        <div class="dialect-count">0</div>
+      </div>
+      <div class="dialect-counter" data-dialect="IRAQ">
+        <div class="dialect-name">IRAQ</div>
+        <div class="dialect-count">0</div>
+      </div>
+      <div class="dialect-counter" data-dialect="YEM">
+        <div class="dialect-name">YEM</div>
+        <div class="dialect-count">0</div>
+      </div>
+      <div class="dialect-counter" data-dialect="GULF">
+        <div class="dialect-name">GULF</div>
+        <div class="dialect-count">0</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const body = document.getElementById('body');
+  const chat = document.getElementById('chat');
+  const input = document.getElementById('message');
+  const send = document.getElementById('send');
+  const menuBtn = document.getElementById('menu-btn');
+  const leftSidebar = document.getElementById('left-sidebar');
+  const chatToggle = document.getElementById('chat-toggle');
+  const rightSidebar = document.getElementById('right-sidebar');
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsOverlay = document.getElementById('settings-overlay');
+  const closeSettings = document.getElementById('close-settings');
+  const title = document.querySelector('h1');
+  const dialectPanel = document.getElementById('dialect-panel');
+
+  // ✅ Keep URL in one place (swap to /webhook/ when live)
+  const WEBHOOK_URL =
+    'https://progquack.app.n8n.cloud/webhook-test/a4d553d5-73ce-409b-8f6e-703bfc6c83d2';
+
+  let isSending = false;
+
+  // Dialect counters state
+  const dialectCounts = {
+    MSA: 0, NA: 0, NILE: 0, LEV: 0, IRAQ: 0, YEM: 0, GULF: 0
+  };
+
+  function updateDialectCount(dialect) {
+    if (dialectCounts.hasOwnProperty(dialect)) {
+      dialectCounts[dialect]++;
+      const counter = document.querySelector(`[data-dialect="${dialect}"]`);
+      if (counter) {
+        const countDisplay = counter.querySelector('.dialect-count');
+        countDisplay.textContent = dialectCounts[dialect];
+
+        counter.classList.add('active');
+        setTimeout(() => counter.classList.remove('active'), 500);
+      }
+    }
+  }
+
+  // 🔥 New: change background based on detected dialect
+  function setDialectBackground(dialect) {
+  ChangeBG(dialect);
+}
+
+
+  // Existing keyboard shortcut for Map-0..6
+  body.addEventListener('keydown', (e) => {
+    if (e.key >= '0' && e.key <= '6') ChangeBG(e.key);
+  });
+
+  function ChangeBG(dialect) {
+  const validDialects = ['MSA', 'NA', 'NILE', 'LEV', 'IRAQ', 'YEM', 'GULF'];
+  if (!validDialects.includes(dialect)) return;
+
+  body.style.backgroundImage = `url("./images/maps/${dialect}.png")`;
+}
+
+  menuBtn.addEventListener('click', () => {
+    leftSidebar.classList.toggle('open');
+  });
+
+  chatToggle.addEventListener('click', () => {
+    rightSidebar.classList.toggle('open');
+    dialectPanel.classList.toggle('shift-left');
+
+    title.style.opacity = rightSidebar.classList.contains('open') ? '0.3' : '1';
+  });
+
+  settingsBtn.addEventListener('click', () => {
+    settingsOverlay.classList.add('open');
+  });
+
+  closeSettings.addEventListener('click', () => {
+    settingsOverlay.classList.remove('open');
+  });
+
+  settingsOverlay.addEventListener('click', (e) => {
+    if (e.target === settingsOverlay) settingsOverlay.classList.remove('open');
+  });
+
+  // Chat functionality
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') send.click();
+  });
+
+  send.addEventListener('click', async () => {
+    if (isSending) return;
+
+    const text = input.value.trim();
+    if (!text) return;
+
+    appendMessage(text, 'user');
+    input.value = '';
+
+    // visible loading bubble
+    appendMessage('...', 'assistant loading');
+
+    isSending = true;
+    send.disabled = true;
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+
+      if (!res.ok) {
+        const errTxt = await res.text();
+        throw new Error(`Webhook failed ${res.status}: ${errTxt}`);
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      // support multiple response shapes
+      const reply =
+        data.final_response ??
+        data.reply ??
+        data.choices?.[0]?.message?.content ??
+        'ما في رد من السيرفر';
+
+      // ✅ use reply instead of raw data.final_response
+      replaceLastMessage(reply);
+
+      if (data.winning_label) {
+        updateDialectCount(data.winning_label);
+        ChangeBG(data.winning_label);
+      }
+
+    } catch (err) {
+      console.error(err);
+      replaceLastMessage('هناك خطب ما في التواصل');
+    } finally {
+      isSending = false;
+      send.disabled = false;
+      input.focus();
+    }
+  });
+
+  function appendMessage(text, role) {
+    const div = document.createElement('div');
+    div.className = 'message ' + role;
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  // fixed selector logic
+  function replaceLastMessage(text) {
+    const messages = chat.querySelectorAll('.message.assistant');
+    if (messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      lastMsg.textContent = text;
+      lastMsg.className = 'message assistant';
+    }
+  }
+</script>
+
+
+</body>
+</html>
