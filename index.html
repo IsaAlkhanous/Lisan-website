@@ -4,700 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>L I S A N</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1) translateX(0); }
-      50% { transform: scale(1.05) translateX(0); }
-    }
-
-    @keyframes pulseShifted {
-      0%, 100% { transform: scale(1) translateX(-150px); }
-      50% { transform: scale(1.05) translateX(-150px); }
-    }
-
-    @keyframes slideInLeft {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(0); }
-    }
-
-    @keyframes slideInRight {
-      from { transform: translateX(100%); }
-      to { transform: translateX(0); }
-    }
-
-    @keyframes messageSlide {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes dots {
-      0%, 20% { content: '.'; }
-      40% { content: '..'; }
-      60%, 100% { content: '...'; }
-    }
-
-    @keyframes fadeInOverlay {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #413548;
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      min-height: 100vh;
-      overflow: hidden;
-      transition: background-image 0.5s ease-in-out;
-    }
-
-    h1 {
-      position: fixed;
-      top: 2rem;
-      left: 0;
-      right: 0;
-      margin: 0 auto;
-      text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(103,174,112,0.6);
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-family: serif;
-      color: #fff;
-      letter-spacing: 0.8rem;
-      animation: fadeIn 1s ease-out, pulse 3s ease-in-out infinite;
-      text-align: center;
-      z-index: 1;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      width: 100%;
-    }
-
-    /* Left Sidebar */
-    #left-sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 280px;
-      height: 100vh;
-      background: linear-gradient(135deg, rgba(103,174,112,0.8), rgba(103,174,112,0.75));
-      backdrop-filter: blur(10px);
-      box-shadow: 4px 0 20px rgba(0,0,0,0.3);
-      transform: translateX(-100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      padding: 2rem 0;
-    }
-
-    #left-sidebar.open {
-      transform: translateX(0);
-    }
-
-    #menu-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      padding: 12px 16px;
-      background: linear-gradient(135deg, rgba(103,174,112,0.9), rgba(103,174,112,1));
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      z-index: 1001;
-    }
-
-    #menu-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(103,174,112,0.5);
-      background: linear-gradient(135deg, rgba(103,174,112,1), rgba(120,190,130,1));
-    }
-
-    #menu-btn img {
-      display: block;
-      filter: brightness(0) invert(1);
-    }
-
-    .sidebar-header {
-      padding: 0 2rem 2rem;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .sidebar-header h2 {
-      color: #fff;
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1rem 0;
-    }
-
-    .nav-item {
-      padding: 1rem 2rem;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border-right: 3px solid transparent;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .nav-item:hover {
-      background: rgba(255,255,255,0.1);
-      border-right-color: #fff;
-      padding-right: 2.5rem;
-    }
-
-    .nav-item.settings {
-      background: rgba(255,255,255,0.05);
-    }
-
-    /* Settings Overlay */
-    #settings-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(5px);
-      z-index: 2000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      animation: fadeInOverlay 0.3s ease;
-    }
-
-    #settings-overlay.open {
-      display: flex;
-    }
-
-    .settings-panel {
-      background: linear-gradient(135deg, rgba(140, 127, 147, 0.95), rgba(140, 127, 147, 0.85));
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 2.5rem;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-      animation: fadeIn 0.4s ease;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .settings-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .settings-header h2 {
-      color: #fff;
-      font-size: 1.8rem;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 0.5rem;
-      transition: all 0.2s ease;
-      border-radius: 8px;
-    }
-
-    .close-btn:hover {
-      background: rgba(255,255,255,0.1);
-      transform: rotate(90deg);
-    }
-
-    .setting-item {
-      margin-bottom: 1.5rem;
-    }
-
-    .setting-item label {
-      display: block;
-      color: #fff;
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .setting-item input[type="text"],
-    .setting-item select {
-      width: 100%;
-      padding: 0.8rem;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.9);
-      font-size: 1rem;
-    }
-
-    .setting-item input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
-
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    /* Right Chat Sidebar */
-    #chat-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 12px 16px;
-      background: linear-gradient(135deg, rgba(140, 127, 147, 0.9), rgba(140, 127, 147, 1));
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      z-index: 999;
-      color: #fff;
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    #chat-toggle:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(140, 127, 147, 0.5);
-      background: linear-gradient(135deg, rgba(140, 127, 147, 1), rgba(150, 137, 157, 1));
-    }
-
-    #right-sidebar {
-      position: fixed;
-      right: 0;
-      top: 0;
-      width: 40%;
-      min-width: 450px;
-      height: 100vh;
-      background: linear-gradient(135deg, #24132e, #31203a);
-      backdrop-filter: blur(10px);
-      box-shadow: -4px 0 20px rgba(0,0,0,0.3);
-      transform: translateX(100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 998;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid rgba(255,255,255,0.1);
-    }
-
-    #right-sidebar.open {
-      transform: translateX(0);
-    }
-
-    .chat-header {
-      padding: 2rem;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      background: rgba(103,174,112,0.95);
-    }
-
-    .chat-header h2 {
-      color: #fff;
-      font-size: 1.8rem;
-      text-align: center;
-    }
-
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1.5rem;
-    }
-
-    #chat::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #chat::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-    }
-
-    #chat::-webkit-scrollbar-thumb {
-      background: rgba(103,174,112,0.6);
-      border-radius: 10px;
-    }
-
-    #chat::-webkit-scrollbar-thumb:hover {
-      background: rgba(103,174,112,0.8);
-    }
-
-    .message {
-      margin: 0.8rem 0;
-      padding: 12px 16px;
-      border-radius: 15px;
-      max-width: 85%;
-      word-wrap: break-word;
-      animation: messageSlide 0.4s ease-out;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
-    }
-
-    .message:hover {
-      transform: translateY(-2px);
-    }
-
-    .user {
-      text-align: right;
-      color: #fff;
-      background: linear-gradient(135deg, rgba(103, 174, 112, 0.7), rgba(103, 174, 112, 0.5));
-      margin-right: auto;
-      border-bottom-right-radius: 5px;
-    }
-
-    .assistant {
-      text-align: right;
-      color: #fff;
-      background: linear-gradient(135deg, rgba(80, 70, 87, 0.7), rgba(80, 70, 87, 0.5));
-      margin-left: auto;
-      border-bottom-left-radius: 5px;
-    }
-
-    .loading::after {
-      content: '...';
-      animation: dots 1.5s infinite;
-    }
-
-    #input-area {
-      display: flex;
-      gap: 0.8rem;
-      padding: 1.5rem;
-      border-top: 1px solid rgba(255,255,255,0.2);
-      background: rgba(103,174,112,0.1);
-    }
-
-    #input-area input {
-      flex: 1;
-      padding: 14px 18px;
-      border-radius: 15px;
-      border: none;
-      background: rgba(255,255,255,0.9);
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    #input-area input:focus {
-      outline: none;
-      box-shadow: 0 4px 20px rgba(103,174,112,0.4);
-      transform: translateY(-2px);
-    }
-
-    ::placeholder {
-      text-align: right;
-      color: #888;
-    }
-
-    #input-area button {
-      padding: 14px 20px;
-      background: linear-gradient(135deg, rgba(103, 174, 112, 0.9), rgba(103, 174, 112, 1));
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      color: #fff;
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    #input-area button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(103,174,112,0.4);
-      background: linear-gradient(135deg, rgba(103, 174, 112, 1), rgba(120, 190, 130, 1));
-    }
-
-    #input-area button:active {
-      transform: translateY(-1px);
-    }
-
-    /* Dialect Counters */
-    #dialect-panel {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0 auto;
-      background: linear-gradient(135deg, rgba(140, 127, 147, 0.95), rgba(140, 127, 147, 0.85));
-      backdrop-filter: blur(15px);
-      border-radius: 15px 15px 0 0;
-      padding: 0.8rem 1.5rem;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-bottom: none;
-      z-index: 500;
-      animation: fadeIn 1s ease-out;
-      max-width: 90%;
-      width: fit-content;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #dialect-panel.shift-left {
-      margin-right: calc(40.75%);
-      margin-left: auto;
-    }
-
-    .panel-header {
-      text-align: center;
-      color: #fff;
-      font-size: 0.85rem;
-      margin-bottom: 0.6rem;
-      font-weight: bold;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    .dialect-grid {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: center;
-      align-items: flex-end;
-    }
-
-    .dialect-counter {
-      background: linear-gradient(135deg, rgba(103,174,112,0.4), rgba(103,174,112,0.35));
-      border-radius: 10px;
-      padding: 0.6rem 0.8rem;
-      text-align: center;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255,255,255,0.1);
-      min-width: 70px;
-    }
-
-    .dialect-counter:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 15px rgba(103,174,112,0.3);
-      background: linear-gradient(135deg, rgba(103,174,112,1), rgba(103,174,112,1));
-    }
-
-    .dialect-counter.active {
-      animation: pulse 0.5s ease;
-      background: linear-gradient(135deg, rgba(103,174,112,0.6), rgba(103,174,112,0.4));
-      border-color: rgba(103,174,112,0.8);
-    }
-
-    .dialect-name {
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: bold;
-      margin-bottom: 0.3rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05rem;
-    }
-
-    .dialect-count {
-      color: #fff;
-      font-size: 1.3rem;
-      font-weight: bold;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-    #attach.recording {
-      background: linear-gradient(135deg, #e63946, #ff6b6b);
-      box-shadow: 0 0 15px rgba(230, 57, 70, 0.8);
-    }
-
-    .message-text {
-      margin-bottom: 0.3rem;
-    }
-
-    .message-actions {
-      display: flex;
-      gap: 0.4rem;
-      justify-content: flex-start;
-      font-size: 0.8rem;
-    }
-
-    .message.assistant .message-actions {
-      opacity: 0.8;
-    }
-
-    .copy-btn,
-    .tts-btn {
-      border: none;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      border-radius: 8px;
-      padding: 4px 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    .copy-btn:hover,
-    .tts-btn:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: translateY(-1px);
-    }
-
-
-
-   /* 🔁 Mobile layout */
-@media (max-width: 768px) {
-  body {
-    overflow: hidden;            /* no page scrolling, only chat area */
-    background-attachment: scroll;
-  }
-
-  /* You can hide the big title on mobile to give more space */
-  h1 {
-    display: none;
-  }
-
-  /* Chat = full-screen app */
-  #right-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;                  /* full height */
-    width: 100%;
-    min-width: 0;
-    height: auto;               /* use top+bottom instead */
-    transform: translateX(0);   /* always open */
-    box-shadow: none;
-    border-left: none;
-    display: flex;
-    flex-direction: column;
-    z-index: 900;
-  }
-
-  .chat-header {
-    padding: 1rem;
-  }
-
-  .chat-header h2 {
-    font-size: 1.2rem;
-  }
-
-  /* Only this area scrolls */
-  #chat {
-    flex: 1;
-    padding: 0.75rem;
-    overflow-y: auto;
-    padding-bottom: 90px;      /* so last messages don’t hide under input */
-  }
-
-  .message {
-    max-width: 100%;
-    font-size: 0.95rem;
-  }
-
-  /* Input bar: fixed at bottom, never moves */
-  #input-area {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    padding: 0.6rem;
-    gap: 0.4rem;
-    border-top: 1px solid rgba(255,255,255,0.2);
-    background: rgba(24, 19, 30, 0.96);
-    z-index: 3000;             /* above everything */
-  }
-
-  #input-area input {
-    font-size: 0.9rem;
-    padding: 0.7rem 0.9rem;
-  }
-
-  #input-area button {
-    padding: 12px 14px;
-    min-width: 44px;
-  }
-
-  .copy-btn,
-  .tts-btn {
-    padding: 4px 8px;
-  }
-
-  /* Hide chat toggle – chat is always visible */
-  #chat-toggle {
-    display: none;
-  }
-
-  /* Hide dialect panel on mobile so it doesn't fight for the bottom area */
-  #dialect-panel {
-    display: none;
-  }
-}
-
-
-/* Extra small screens */
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.5rem;
-    letter-spacing: 0.2rem;
-  }
-
-  /* If you want max simplicity on very small phones, hide the dialect panel */
-  #dialect-panel {
-    display: none;
-  }
-}
-
-
-  </style>
-</head>
+  <link rel="stylesheet" href="styles/index.css"> 
+  </head>
 <body id="body">
+  
   <h1>لـسـا ن</h1>
   
   <!-- Menu Button -->
   <button id="menu-btn">
     <img src="images/menu.png" alt="menu" width="20" height="20">
   </button>
-
-  <!-- Left Sidebar -->
+  
+    <!-- Side Bar -->
   <div id="left-sidebar">
     <div class="sidebar-header">
       <h2>القائمة</h2>
     </div>
     <div class="sidebar-nav">
       <div class="nav-item">
-        <span>🏠</span>
+        <img src="images/icons/home.svg" alt="الصفحة الرئيسية icon" width="24" height="24">
         <span>الصفحة الرئيسية</span>
       </div>
-      <div class="nav-item">
-        <span>💬</span>
-        <span>المحادثات السابقة</span>
-      </div>
       <div class="nav-item settings" id="settings-btn">
-        <span>⚙️</span>
+        <img src="images/icons/settings.svg" alt="الإعدادات icon" width="24" height="24">
         <span>الإعدادات</span>
       </div>
       <div class="nav-item">
-        <span>👤</span>
+        <img src="images/icons/user.svg" alt="تسجيل الدخول icon" width="24" height="24">
         <span>تسجيل الدخول</span>
       </div>
-      <div class="nav-item">
-        <span>ℹ️</span>
+      <div class="nav-item" id="info-btn">
+        <img src="images/icons/info.svg" alt="حول icon" width="24" height="24">
         <span>حول</span>
       </div>
     </div>
   </div>
-
+  
   <!-- Settings Overlay -->
   <div id="settings-overlay">
     <div class="settings-panel">
@@ -745,10 +87,10 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Chat Toggle Button -->
   <button id="chat-toggle">💬 المحادثة</button>
-
+  
   <!-- Right Chat Sidebar -->
   <div id="right-sidebar">
     <div class="chat-header">
@@ -757,13 +99,13 @@
     <div id="chat"></div>
     <div id="input-area">
       <button id="attach" title="تسجيل صوت">
-      <img src="images/mic.svg" style="width: 20px; height: 20px;" alt="mic">
+        <img src="images/mic.svg" style="width: 20px; height: 20px;" alt="mic">
       </button>
       <button id="send">أرسل</button>
       <input type="text" id="message" placeholder="كيف قد أساعدك اليوم؟" />
     </div>
   </div>
-
+  
   <!-- Dialect Detection Panel -->
   <div id="dialect-panel">
     <div class="panel-header">اكتشاف اللهجات</div>
@@ -798,475 +140,76 @@
       </div>
     </div>
   </div>
-
-  <script>
-const body = document.getElementById('body');
-const chat = document.getElementById('chat');
-const input = document.getElementById('message');
-const send = document.getElementById('send');
-const menuBtn = document.getElementById('menu-btn');
-const leftSidebar = document.getElementById('left-sidebar');
-const chatToggle = document.getElementById('chat-toggle');
-const rightSidebar = document.getElementById('right-sidebar');
-const settingsBtn = document.getElementById('settings-btn');
-const settingsOverlay = document.getElementById('settings-overlay');
-const closeSettings = document.getElementById('close-settings');
-const title = document.querySelector('h1');
-const dialectPanel = document.getElementById('dialect-panel');
-
-// 🔊 Global Text-to-Speech setup
-const hasTTS = 'speechSynthesis' in window;
-const synth = window.speechSynthesis;
-let ttsVoices = [];
-// Load available voices
-function loadVoices() {
-  if (!hasTTS) return;
-  ttsVoices = synth.getVoices();
-  console.log(
-    'Available TTS voices:',
-    ttsVoices.map(v => `${v.name} (${v.lang})`)
-  );
-}
-
-if (hasTTS) {
-  loadVoices();
-  // voices list can load asynchronously
-  if (typeof synth.addEventListener === 'function') {
-    synth.addEventListener('voiceschanged', loadVoices);
-  } else if ('onvoiceschanged' in synth) {
-    synth.onvoiceschanged = loadVoices;
-  }
-}
-
-// Helper: speak some text
-function speakText(msg) {
-  if (!hasTTS) {
-    console.warn('Text-to-speech not supported in this browser');
-    return;
-  }
-
-  const text = (msg || '').trim();
-  if (!text) return;
-
-  // Stop any ongoing speech
-  synth.cancel();
-
-  const utter = new SpeechSynthesisUtterance(text);
-
-  // Detect if text is mostly Arabic
-  const isArabic = /[\u0600-\u06FF]/.test(text);
-
-  // Try to pick an Arabic voice if we have one
-  let voice = null;
-  if (isArabic && ttsVoices.length) {
-    voice = ttsVoices.find(v =>
-      v.lang.toLowerCase().startsWith('ar')
-    );
-  }
-
-  // Fallback: pick an English voice or the first available
-  if (!voice && ttsVoices.length) {
-    voice =
-      ttsVoices.find(v =>
-        v.lang.toLowerCase().startsWith('en')
-      ) || ttsVoices[0];
-  }
-
-  if (voice) {
-    utter.voice = voice;
-    utter.lang = voice.lang;
-  } else {
-    // last-resort fallback
-    utter.lang = isArabic ? 'ar' : 'en-US';
-  }
-
-  console.log(
-    'Speaking with voice:',
-    voice ? `${voice.name} (${voice.lang})` : utter.lang
-  );
-  synth.speak(utter);
-}
-
-// ✅ API URL
-const WEBHOOK_URL =
-  'https://progquack.app.n8n.cloud/webhook/a4d553d5-73ce-409b-8f6e-703bfc6c83d2';
-const INIT_URL = 'https://progquack.app.n8n.cloud/webhook/get-region-counts';
-let isSending = false;
-
-
-// Dialect counters state
-const dialectCounts = {
-  MSA: 0, NA: 0, NILE: 0, LEV: 0, IRAQ: 0, YEM: 0, GULF: 0
-};
-
-const DIALECTS = ['MSA', 'NA', 'NILE', 'LEV', 'IRAQ', 'YEM', 'GULF'];
-window.addEventListener('load', () => {
-  ChangeBG('MSA');
-  loadInitialStats();
-});
-async function loadInitialStats() {
-  try {
-    const res = await fetch(INIT_URL);
-    if (!res.ok) {
-      console.error('Init stats failed:', res.status);
-      return;
-    }
-
-    const data = await res.json();
-    console.log('Init counts:', data);
-
-    if (data.counts) {
-      // Merge into local state
-      for (const key in data.counts) {
-        if (dialectCounts.hasOwnProperty(key)) {
-          dialectCounts[key] = data.counts[key];
-
-          // Update UI counter
-          const counter = document.querySelector(
-            `[data-dialect="${key}"] .dialect-count`
-          );
-          if (counter) counter.textContent = dialectCounts[key];
-        }
-      }
-    }
-  } catch (err) {
-    console.error('Error loading initial stats:', err);
-  }
-}
-
-// ✅ Change background based on dialect code
-function ChangeBG(dialect) {
-  if (!DIALECTS.includes(dialect)) {
-    console.warn('ChangeBG: invalid dialect:', dialect);
-    return;
-  }
-
-  const url = `./images/map/${dialect}.png`;
-  console.log('ChangeBG: setting background to', url);
-  body.style.backgroundImage = `url("${url}")`;
-}
-
-function updateDialectCount(dialect) {
-  if (dialectCounts.hasOwnProperty(dialect)) {
-    dialectCounts[dialect]++;
-    const counter = document.querySelector(`[data-dialect="${dialect}"]`);
-    if (counter) {
-      const countDisplay = counter.querySelector('.dialect-count');
-      countDisplay.textContent = dialectCounts[dialect];
-
-      counter.classList.add('active');
-      setTimeout(() => counter.classList.remove('active'), 500);
-    }
-  }
-}
-
-// (Optional) keyboard shortcuts 1–7 → dialects
-body.addEventListener('keydown', (e) => {
-  const idx = parseInt(e.key, 10) - 1;
-  if (idx >= 0 && idx < DIALECTS.length) {
-    ChangeBG(DIALECTS[idx]);
-  }
-});
-
-menuBtn.addEventListener('click', () => {
-  leftSidebar.classList.toggle('open');
-});
-
-chatToggle.addEventListener('click', () => {
-  rightSidebar.classList.toggle('open');
-  dialectPanel.classList.toggle('shift-left');
-
-  title.style.opacity = rightSidebar.classList.contains('open') ? '0.3' : '1';
-});
-
-settingsBtn.addEventListener('click', () => {
-  settingsOverlay.classList.add('open');
-});
-
-closeSettings.addEventListener('click', () => {
-  settingsOverlay.classList.remove('open');
-});
-
-settingsOverlay.addEventListener('click', (e) => {
-  if (e.target === settingsOverlay) settingsOverlay.classList.remove('open');
-});
-
-// Chat functionality
-input.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') send.click();
-});
-
-send.addEventListener('click', async () => {
-  if (isSending) return;
-
-  const text = input.value.trim();
-  if (!text) return;
-
-  appendMessage(text, 'user');
-  input.value = '';
-
-  appendMessage('...', 'assistant loading');
-
-  isSending = true;
-  send.disabled = true;
-
-  try {
-    const res = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text })
-    });
-
-    if (!res.ok) {
-      const errTxt = await res.text();
-      throw new Error(`Webhook failed ${res.status}: ${errTxt}`);
-    }
-
-    const data = await res.json().catch(() => ({}));
-
-    const reply =
-      data.final_response ??
-      data.reply ??
-      data.choices?.[0]?.message?.content ??
-      'ما في رد من السيرفر';
-
-    replaceLastMessage(reply);
-
-    if (data.winning_label) {
-      updateDialectCount(data.winning_label);
-      ChangeBG(data.winning_label);
-    }
-
-  } catch (err) {
-    console.error(err);
-    replaceLastMessage('هناك خطب ما في التواصل');
-  } finally {
-    isSending = false;
-    send.disabled = false;
-    input.focus();
-  }
-});
-
-function appendMessage(text, role) {
-  const div = document.createElement('div');
-  // role can be "assistant loading", so just check startsWith
-  const baseRole = role.startsWith('assistant') ? 'assistant' : role;
-  div.className = 'message ' + baseRole;
-
-  // Text container
-  const textDiv = document.createElement('div');
-  textDiv.className = 'message-text';
-  textDiv.textContent = text;
-  div.appendChild(textDiv);
-
-  // Only assistant messages get buttons
-  if (baseRole === 'assistant') {
-    const actions = document.createElement('div');
-    actions.className = 'message-actions';
-
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'copy-btn';
-    copyBtn.textContent = '📋';
-    copyBtn.title = 'نسخ الرد';
-
-    const ttsBtn = document.createElement('button');
-    ttsBtn.className = 'tts-btn';
-    ttsBtn.textContent = '🔊';
-    ttsBtn.title = 'قراءة الرد بصوت عالٍ';
-
-    // Copy handler
-    copyBtn.addEventListener('click', () => {
-      const textToCopy = textDiv.textContent;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(textToCopy).catch(err => {
-          console.error('Copy failed:', err);
-        });
-      } else {
-        // fallback
-        const ta = document.createElement('textarea');
-        ta.value = textToCopy;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-    });
-
-
-    // TTS handler
-      ttsBtn.addEventListener('click', () => {
-        const msg = textDiv.textContent;
-        speakText(msg);
-      });
-
-
-    actions.appendChild(copyBtn);
-    actions.appendChild(ttsBtn);
-    div.appendChild(actions);
-  }
-
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-
-function replaceLastMessage(text) {
-  const messages = chat.querySelectorAll('.message.assistant');
-  if (messages.length === 0) return;
-
-  const lastMsg = messages[messages.length - 1];
-
-  // Find existing text div or create structure if needed
-  let textDiv = lastMsg.querySelector('.message-text');
-
-  if (!textDiv) {
-    // This happens for the initial "loading" bubble: rebuild it
-    lastMsg.innerHTML = '';
-    lastMsg.className = 'message assistant';
-
-    textDiv = document.createElement('div');
-    textDiv.className = 'message-text';
-    lastMsg.appendChild(textDiv);
-
-    const actions = document.createElement('div');
-    actions.className = 'message-actions';
-
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'copy-btn';
-    copyBtn.textContent = '📋';
-    copyBtn.title = 'نسخ الرد';
-
-    const ttsBtn = document.createElement('button');
-    ttsBtn.className = 'tts-btn';
-    ttsBtn.textContent = '🔊';
-    ttsBtn.title = 'قراءة الرد بصوت عالٍ';
-
-    // same handlers as above
-    copyBtn.addEventListener('click', () => {
-      const textToCopy = textDiv.textContent;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(textToCopy).catch(err => {
-          console.error('Copy failed:', err);
-        });
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = textToCopy;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-    });
-
-    ttsBtn.addEventListener('click', () => {
-      const msg = textDiv.textContent;
-      speakText(msg);
-    });
-
-
-    actions.appendChild(copyBtn);
-    actions.appendChild(ttsBtn);
-    lastMsg.appendChild(actions);
-  }
-
-  textDiv.textContent = text;
-}
-
-
-// Microphone Section
-
-const attachBtn = document.getElementById('attach');
-
-let recognition = null;
-let isRecording = false;
-let finalTranscript = '';
-
-(function setupSpeech() {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    console.warn('SpeechRecognition not supported');
-    attachBtn.disabled = true;
-    attachBtn.title = 'المتصفح لا يدعم تحويل الصوت إلى نص';
-    return;
-  }
-
-  recognition = new SpeechRecognition();
-  recognition.lang = 'ar';          // pick dialect: ar-SA / ar-EG / ar-LB ...
-  recognition.interimResults = true;   // show partial text while speaking
-  recognition.continuous = false;      // stop after one phrase
-
-  recognition.addEventListener('start', () => {
-    isRecording = true;
-    finalTranscript = '';
-    attachBtn.classList.add('recording');
-    attachBtn.title = 'يتم التسجيل... اضغط للإيقاف';
-    console.log('Speech: start');
-  });
-
-  recognition.addEventListener('end', () => {
-    isRecording = false;
-    attachBtn.classList.remove('recording');
-    attachBtn.title = 'تسجيل صوت';
-    console.log('Speech: end');
-
-    // if we got final text, send it like a normal message
-    const text = finalTranscript.trim();
-    if (text) {
-      input.value = text;   // show in input
-      // send.click();         // trigger your existing send logic
-    }
-  });
-
-  recognition.addEventListener('error', (e) => {
-    console.error('Speech error:', e);
-    isRecording = false;
-    attachBtn.classList.remove('recording');
-    attachBtn.title = 'تسجيل صوت';
-  });
-
-  recognition.addEventListener('result', (event) => {
-    let interim = '';
-    finalTranscript = '';
-
-    for (let i = 0; i < event.results.length; i++) {
-      const res = event.results[i];
-      if (res.isFinal) {
-        finalTranscript += res[0].transcript;
-      } else {
-        interim += res[0].transcript;
-      }
-    }
-
-    const current = (finalTranscript + ' ' + interim).trim();
-
-    // show live transcription in the input box
-    input.value = current;
-  });
-
-  attachBtn.addEventListener('click', () => {
-    if (!recognition) return;
-
-    if (isRecording) {
-      // stop recording manually
-      recognition.stop();
-    } else {
-      // start a new recording
-      try {
-        recognition.start();
-      } catch (e) {
-        // Chrome throws if start() is called while it's already starting
-        console.warn('Could not start recognition:', e);
-      }
-    }
-  });
-})();
-
-  // Text-to-Speech
   
-</script>
+<!-- Info / About Section -->
+<section id="info-section" class="info-section hidden" dir="ltr">
+  <div class="info-card">
+    <div class="info-header">
+      <h2 class="info-title">About LISAN</h2>
+      <p class="info-tagline">Multi Dialect Arabic Chatbot Powered by LLMs</p>
+    </div>
+      
+    <div class="info-content">
+      <p>
+        LISAN is a research driven, AI powered chatbot designed to understand and generate
+        responses in multiple Arabic dialects. Built as part of our Senior Project at the
+        University of Sharjah, LISAN addresses a major limitation in todays Large Language
+        Models (LLMs): their struggle to naturally process the diverse dialects spoken across
+        the MENA region.
+      </p>
+
+      <p>
+        Our system uses a multi agent LLM ensemble that detects the users dialect
+        (such as Gulf, Levantine, North African, Iraqi, Yemeni, Nile, or Modern Standard Arabic)
+        and responds in the same dialect. Through extensive testing, weighted voting, and backend
+        integration using n8n, LISAN delivers a smooth, culturally adaptive conversation experience
+        that stands apart from existing single dialect or MSA only systems.
+      </p>
+
+      <p>
+        LISAN represents our ambition to create inclusive, accessible, and dialect aware AI tools
+        for Arabic speaking communities.
+      </p>
+    </div>
+      
+    <div class="info-grid">
+      <div class="info-column">
+        <h3 class="info-subtitle">Our Team</h3>
+        <ul class="info-team-list">
+          <li>EmadEddin A. Al Chmri</li>
+          <li>Isa Al Khanous</li>
+          <li>Moheeb Suliman</li>
+          <li>Mohammad R. Hardan</li>
+        </ul>
+
+        <p class="info-supervisor">
+          Supervised by<br>
+          <span>Dr. Ashraf M. Al Nagar</span>
+        </p>
+      </div>
+        
+      <div class="info-column">
+        <h3 class="info-subtitle">Project Repository</h3>
+        <p class="info-repo-text">You can explore the project on GitHub:</p>
+
+        <a href="https://github.com/IsaAlkhanous/Lisan-website"
+           class="info-repo-link"
+           target="_blank"
+           rel="noopener noreferrer">
+          github.com/IsaAlkhanous/Lisan-website
+        </a>
+
+        <div class="info-tags">
+          <span class="info-tag">Arabic NLP</span>
+          <span class="info-tag">Dialect Detection</span>
+          <span class="info-tag">LLM Ensemble</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 
+<script src="js/script.js" defer></script> 
 </body>
 </html>
