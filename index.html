@@ -54,7 +54,6 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-image: url("Map-0.png");
       background-color: #413548;
       background-repeat: no-repeat;
       background-size: cover;
@@ -514,55 +513,152 @@
       font-weight: bold;
       text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
-
-    @media (max-width: 768px) {
-      #right-sidebar {
-        width: 100%;
-        min-width: unset;
-      }
-
-      #left-sidebar {
-        width: 250px;
-      }
-
-      h1 {
-        font-size: 2.5rem;
-        letter-spacing: 0.4rem;
-      }
-
-      .settings-panel {
-        width: 95%;
-        padding: 2rem;
-      }
-
-      #dialect-panel {
-        bottom: 0;
-        padding: 0.6rem 1rem;
-      }
-
-      #dialect-panel.shift-left {
-        margin-right: auto;
-        margin-left: auto;
-      }
-
-      .dialect-grid {
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-
-      .dialect-counter {
-        padding: 0.5rem 0.6rem;
-        min-width: 60px;
-      }
-
-      .dialect-name {
-        font-size: 0.65rem;
-      }
-
-      .dialect-count {
-        font-size: 1.1rem;
-      }
+    #attach.recording {
+      background: linear-gradient(135deg, #e63946, #ff6b6b);
+      box-shadow: 0 0 15px rgba(230, 57, 70, 0.8);
     }
+
+    .message-text {
+      margin-bottom: 0.3rem;
+    }
+
+    .message-actions {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: flex-start;
+      font-size: 0.8rem;
+    }
+
+    .message.assistant .message-actions {
+      opacity: 0.8;
+    }
+
+    .copy-btn,
+    .tts-btn {
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-radius: 8px;
+      padding: 4px 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .copy-btn:hover,
+    .tts-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+
+
+   /* 🔁 Mobile layout */
+@media (max-width: 768px) {
+  body {
+    overflow: hidden;            /* no page scrolling, only chat area */
+    background-attachment: scroll;
+  }
+
+  /* You can hide the big title on mobile to give more space */
+  h1 {
+    display: none;
+  }
+
+  /* Chat = full-screen app */
+  #right-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;                  /* full height */
+    width: 100%;
+    min-width: 0;
+    height: auto;               /* use top+bottom instead */
+    transform: translateX(0);   /* always open */
+    box-shadow: none;
+    border-left: none;
+    display: flex;
+    flex-direction: column;
+    z-index: 900;
+  }
+
+  .chat-header {
+    padding: 1rem;
+  }
+
+  .chat-header h2 {
+    font-size: 1.2rem;
+  }
+
+  /* Only this area scrolls */
+  #chat {
+    flex: 1;
+    padding: 0.75rem;
+    overflow-y: auto;
+    padding-bottom: 90px;      /* so last messages don’t hide under input */
+  }
+
+  .message {
+    max-width: 100%;
+    font-size: 0.95rem;
+  }
+
+  /* Input bar: fixed at bottom, never moves */
+  #input-area {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 0.6rem;
+    gap: 0.4rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    background: rgba(24, 19, 30, 0.96);
+    z-index: 3000;             /* above everything */
+  }
+
+  #input-area input {
+    font-size: 0.9rem;
+    padding: 0.7rem 0.9rem;
+  }
+
+  #input-area button {
+    padding: 12px 14px;
+    min-width: 44px;
+  }
+
+  .copy-btn,
+  .tts-btn {
+    padding: 4px 8px;
+  }
+
+  /* Hide chat toggle – chat is always visible */
+  #chat-toggle {
+    display: none;
+  }
+
+  /* Hide dialect panel on mobile so it doesn't fight for the bottom area */
+  #dialect-panel {
+    display: none;
+  }
+}
+
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+    letter-spacing: 0.2rem;
+  }
+
+  /* If you want max simplicity on very small phones, hide the dialect panel */
+  #dialect-panel {
+    display: none;
+  }
+}
+
+
   </style>
 </head>
 <body id="body">
@@ -570,7 +666,7 @@
   
   <!-- Menu Button -->
   <button id="menu-btn">
-    <img src="menu.png" alt="menu" width="20" height="20">
+    <img src="images/menu.png" alt="menu" width="20" height="20">
   </button>
 
   <!-- Left Sidebar -->
@@ -660,8 +756,8 @@
     </div>
     <div id="chat"></div>
     <div id="input-area">
-      <button id="attach">
-        <img src="attach-pic.png" style="width: 20px; height: 20px;" alt="attach">
+      <button id="attach" title="تسجيل صوت">
+      <img src="images/mic.svg" style="width: 20px; height: 20px;" alt="mic">
       </button>
       <button id="send">أرسل</button>
       <input type="text" id="message" placeholder="كيف قد أساعدك اليوم؟" />
@@ -704,162 +800,471 @@
   </div>
 
   <script>
-  const body = document.getElementById('body');
-  const chat = document.getElementById('chat');
-  const input = document.getElementById('message');
-  const send = document.getElementById('send');
-  const menuBtn = document.getElementById('menu-btn');
-  const leftSidebar = document.getElementById('left-sidebar');
-  const chatToggle = document.getElementById('chat-toggle');
-  const rightSidebar = document.getElementById('right-sidebar');
-  const settingsBtn = document.getElementById('settings-btn');
-  const settingsOverlay = document.getElementById('settings-overlay');
-  const closeSettings = document.getElementById('close-settings');
-  const title = document.querySelector('h1');
-  const dialectPanel = document.getElementById('dialect-panel');
+const body = document.getElementById('body');
+const chat = document.getElementById('chat');
+const input = document.getElementById('message');
+const send = document.getElementById('send');
+const menuBtn = document.getElementById('menu-btn');
+const leftSidebar = document.getElementById('left-sidebar');
+const chatToggle = document.getElementById('chat-toggle');
+const rightSidebar = document.getElementById('right-sidebar');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsOverlay = document.getElementById('settings-overlay');
+const closeSettings = document.getElementById('close-settings');
+const title = document.querySelector('h1');
+const dialectPanel = document.getElementById('dialect-panel');
 
-  // ✅ Keep URL in one place (swap to /webhook/ when live)
-  const WEBHOOK_URL =
-    'https://progquack.app.n8n.cloud/webhook-test/a4d553d5-73ce-409b-8f6e-703bfc6c83d2';
+// 🔊 Global Text-to-Speech setup
+const hasTTS = 'speechSynthesis' in window;
+const synth = window.speechSynthesis;
+let ttsVoices = [];
+// Load available voices
+function loadVoices() {
+  if (!hasTTS) return;
+  ttsVoices = synth.getVoices();
+  console.log(
+    'Available TTS voices:',
+    ttsVoices.map(v => `${v.name} (${v.lang})`)
+  );
+}
 
-  let isSending = false;
+if (hasTTS) {
+  loadVoices();
+  // voices list can load asynchronously
+  if (typeof synth.addEventListener === 'function') {
+    synth.addEventListener('voiceschanged', loadVoices);
+  } else if ('onvoiceschanged' in synth) {
+    synth.onvoiceschanged = loadVoices;
+  }
+}
 
-  // Dialect counters state
-  const dialectCounts = {
-    MSA: 0, NA: 0, NILE: 0, LEV: 0, IRAQ: 0, YEM: 0, GULF: 0
-  };
-
-  function updateDialectCount(dialect) {
-    if (dialectCounts.hasOwnProperty(dialect)) {
-      dialectCounts[dialect]++;
-      const counter = document.querySelector(`[data-dialect="${dialect}"]`);
-      if (counter) {
-        const countDisplay = counter.querySelector('.dialect-count');
-        countDisplay.textContent = dialectCounts[dialect];
-
-        counter.classList.add('active');
-        setTimeout(() => counter.classList.remove('active'), 500);
-      }
-    }
+// Helper: speak some text
+function speakText(msg) {
+  if (!hasTTS) {
+    console.warn('Text-to-speech not supported in this browser');
+    return;
   }
 
-  // 🔥 New: change background based on detected dialect
-  function setDialectBackground(dialect) {
-  ChangeBG(dialect);
+  const text = (msg || '').trim();
+  if (!text) return;
+
+  // Stop any ongoing speech
+  synth.cancel();
+
+  const utter = new SpeechSynthesisUtterance(text);
+
+  // Detect if text is mostly Arabic
+  const isArabic = /[\u0600-\u06FF]/.test(text);
+
+  // Try to pick an Arabic voice if we have one
+  let voice = null;
+  if (isArabic && ttsVoices.length) {
+    voice = ttsVoices.find(v =>
+      v.lang.toLowerCase().startsWith('ar')
+    );
+  }
+
+  // Fallback: pick an English voice or the first available
+  if (!voice && ttsVoices.length) {
+    voice =
+      ttsVoices.find(v =>
+        v.lang.toLowerCase().startsWith('en')
+      ) || ttsVoices[0];
+  }
+
+  if (voice) {
+    utter.voice = voice;
+    utter.lang = voice.lang;
+  } else {
+    // last-resort fallback
+    utter.lang = isArabic ? 'ar' : 'en-US';
+  }
+
+  console.log(
+    'Speaking with voice:',
+    voice ? `${voice.name} (${voice.lang})` : utter.lang
+  );
+  synth.speak(utter);
 }
 
+// ✅ API URL
+const WEBHOOK_URL =
+  'https://progquack.app.n8n.cloud/webhook/a4d553d5-73ce-409b-8f6e-703bfc6c83d2';
+const INIT_URL = 'https://progquack.app.n8n.cloud/webhook/get-region-counts';
+let isSending = false;
 
-  // Existing keyboard shortcut for Map-0..6
-  body.addEventListener('keydown', (e) => {
-    if (e.key >= '0' && e.key <= '6') ChangeBG(e.key);
-  });
 
-  function ChangeBG(dialect) {
-  const validDialects = ['MSA', 'NA', 'NILE', 'LEV', 'IRAQ', 'YEM', 'GULF'];
-  if (!validDialects.includes(dialect)) return;
+// Dialect counters state
+const dialectCounts = {
+  MSA: 0, NA: 0, NILE: 0, LEV: 0, IRAQ: 0, YEM: 0, GULF: 0
+};
 
-  body.style.backgroundImage = `url("./images/maps/${dialect}.png")`;
+const DIALECTS = ['MSA', 'NA', 'NILE', 'LEV', 'IRAQ', 'YEM', 'GULF'];
+window.addEventListener('load', () => {
+  ChangeBG('MSA');
+  loadInitialStats();
+});
+async function loadInitialStats() {
+  try {
+    const res = await fetch(INIT_URL);
+    if (!res.ok) {
+      console.error('Init stats failed:', res.status);
+      return;
+    }
+
+    const data = await res.json();
+    console.log('Init counts:', data);
+
+    if (data.counts) {
+      // Merge into local state
+      for (const key in data.counts) {
+        if (dialectCounts.hasOwnProperty(key)) {
+          dialectCounts[key] = data.counts[key];
+
+          // Update UI counter
+          const counter = document.querySelector(
+            `[data-dialect="${key}"] .dialect-count`
+          );
+          if (counter) counter.textContent = dialectCounts[key];
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error loading initial stats:', err);
+  }
 }
 
-  menuBtn.addEventListener('click', () => {
-    leftSidebar.classList.toggle('open');
-  });
+// ✅ Change background based on dialect code
+function ChangeBG(dialect) {
+  if (!DIALECTS.includes(dialect)) {
+    console.warn('ChangeBG: invalid dialect:', dialect);
+    return;
+  }
 
-  chatToggle.addEventListener('click', () => {
-    rightSidebar.classList.toggle('open');
-    dialectPanel.classList.toggle('shift-left');
+  const url = `./images/map/${dialect}.png`;
+  console.log('ChangeBG: setting background to', url);
+  body.style.backgroundImage = `url("${url}")`;
+}
 
-    title.style.opacity = rightSidebar.classList.contains('open') ? '0.3' : '1';
-  });
+function updateDialectCount(dialect) {
+  if (dialectCounts.hasOwnProperty(dialect)) {
+    dialectCounts[dialect]++;
+    const counter = document.querySelector(`[data-dialect="${dialect}"]`);
+    if (counter) {
+      const countDisplay = counter.querySelector('.dialect-count');
+      countDisplay.textContent = dialectCounts[dialect];
 
-  settingsBtn.addEventListener('click', () => {
-    settingsOverlay.classList.add('open');
-  });
+      counter.classList.add('active');
+      setTimeout(() => counter.classList.remove('active'), 500);
+    }
+  }
+}
 
-  closeSettings.addEventListener('click', () => {
-    settingsOverlay.classList.remove('open');
-  });
+// (Optional) keyboard shortcuts 1–7 → dialects
+body.addEventListener('keydown', (e) => {
+  const idx = parseInt(e.key, 10) - 1;
+  if (idx >= 0 && idx < DIALECTS.length) {
+    ChangeBG(DIALECTS[idx]);
+  }
+});
 
-  settingsOverlay.addEventListener('click', (e) => {
-    if (e.target === settingsOverlay) settingsOverlay.classList.remove('open');
-  });
+menuBtn.addEventListener('click', () => {
+  leftSidebar.classList.toggle('open');
+});
 
-  // Chat functionality
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') send.click();
-  });
+chatToggle.addEventListener('click', () => {
+  rightSidebar.classList.toggle('open');
+  dialectPanel.classList.toggle('shift-left');
 
-  send.addEventListener('click', async () => {
-    if (isSending) return;
+  title.style.opacity = rightSidebar.classList.contains('open') ? '0.3' : '1';
+});
 
-    const text = input.value.trim();
-    if (!text) return;
+settingsBtn.addEventListener('click', () => {
+  settingsOverlay.classList.add('open');
+});
 
-    appendMessage(text, 'user');
-    input.value = '';
+closeSettings.addEventListener('click', () => {
+  settingsOverlay.classList.remove('open');
+});
 
-    // visible loading bubble
-    appendMessage('...', 'assistant loading');
+settingsOverlay.addEventListener('click', (e) => {
+  if (e.target === settingsOverlay) settingsOverlay.classList.remove('open');
+});
 
-    isSending = true;
-    send.disabled = true;
+// Chat functionality
+input.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') send.click();
+});
 
-    try {
-      const res = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
+send.addEventListener('click', async () => {
+  if (isSending) return;
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  appendMessage(text, 'user');
+  input.value = '';
+
+  appendMessage('...', 'assistant loading');
+
+  isSending = true;
+  send.disabled = true;
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+
+    if (!res.ok) {
+      const errTxt = await res.text();
+      throw new Error(`Webhook failed ${res.status}: ${errTxt}`);
+    }
+
+    const data = await res.json().catch(() => ({}));
+
+    const reply =
+      data.final_response ??
+      data.reply ??
+      data.choices?.[0]?.message?.content ??
+      'ما في رد من السيرفر';
+
+    replaceLastMessage(reply);
+
+    if (data.winning_label) {
+      updateDialectCount(data.winning_label);
+      ChangeBG(data.winning_label);
+    }
+
+  } catch (err) {
+    console.error(err);
+    replaceLastMessage('هناك خطب ما في التواصل');
+  } finally {
+    isSending = false;
+    send.disabled = false;
+    input.focus();
+  }
+});
+
+function appendMessage(text, role) {
+  const div = document.createElement('div');
+  // role can be "assistant loading", so just check startsWith
+  const baseRole = role.startsWith('assistant') ? 'assistant' : role;
+  div.className = 'message ' + baseRole;
+
+  // Text container
+  const textDiv = document.createElement('div');
+  textDiv.className = 'message-text';
+  textDiv.textContent = text;
+  div.appendChild(textDiv);
+
+  // Only assistant messages get buttons
+  if (baseRole === 'assistant') {
+    const actions = document.createElement('div');
+    actions.className = 'message-actions';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.textContent = '📋';
+    copyBtn.title = 'نسخ الرد';
+
+    const ttsBtn = document.createElement('button');
+    ttsBtn.className = 'tts-btn';
+    ttsBtn.textContent = '🔊';
+    ttsBtn.title = 'قراءة الرد بصوت عالٍ';
+
+    // Copy handler
+    copyBtn.addEventListener('click', () => {
+      const textToCopy = textDiv.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).catch(err => {
+          console.error('Copy failed:', err);
+        });
+      } else {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = textToCopy;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+    });
+
+
+    // TTS handler
+      ttsBtn.addEventListener('click', () => {
+        const msg = textDiv.textContent;
+        speakText(msg);
       });
 
-      if (!res.ok) {
-        const errTxt = await res.text();
-        throw new Error(`Webhook failed ${res.status}: ${errTxt}`);
+
+    actions.appendChild(copyBtn);
+    actions.appendChild(ttsBtn);
+    div.appendChild(actions);
+  }
+
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+
+function replaceLastMessage(text) {
+  const messages = chat.querySelectorAll('.message.assistant');
+  if (messages.length === 0) return;
+
+  const lastMsg = messages[messages.length - 1];
+
+  // Find existing text div or create structure if needed
+  let textDiv = lastMsg.querySelector('.message-text');
+
+  if (!textDiv) {
+    // This happens for the initial "loading" bubble: rebuild it
+    lastMsg.innerHTML = '';
+    lastMsg.className = 'message assistant';
+
+    textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    lastMsg.appendChild(textDiv);
+
+    const actions = document.createElement('div');
+    actions.className = 'message-actions';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.textContent = '📋';
+    copyBtn.title = 'نسخ الرد';
+
+    const ttsBtn = document.createElement('button');
+    ttsBtn.className = 'tts-btn';
+    ttsBtn.textContent = '🔊';
+    ttsBtn.title = 'قراءة الرد بصوت عالٍ';
+
+    // same handlers as above
+    copyBtn.addEventListener('click', () => {
+      const textToCopy = textDiv.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).catch(err => {
+          console.error('Copy failed:', err);
+        });
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = textToCopy;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
       }
+    });
 
-      const data = await res.json().catch(() => ({}));
+    ttsBtn.addEventListener('click', () => {
+      const msg = textDiv.textContent;
+      speakText(msg);
+    });
 
-      // support multiple response shapes
-      const reply =
-        data.final_response ??
-        data.reply ??
-        data.choices?.[0]?.message?.content ??
-        'ما في رد من السيرفر';
 
-      // ✅ use reply instead of raw data.final_response
-      replaceLastMessage(reply);
+    actions.appendChild(copyBtn);
+    actions.appendChild(ttsBtn);
+    lastMsg.appendChild(actions);
+  }
 
-      if (data.winning_label) {
-        updateDialectCount(data.winning_label);
-        ChangeBG(data.winning_label);
-      }
+  textDiv.textContent = text;
+}
 
-    } catch (err) {
-      console.error(err);
-      replaceLastMessage('هناك خطب ما في التواصل');
-    } finally {
-      isSending = false;
-      send.disabled = false;
-      input.focus();
+
+// Microphone Section
+
+const attachBtn = document.getElementById('attach');
+
+let recognition = null;
+let isRecording = false;
+let finalTranscript = '';
+
+(function setupSpeech() {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    console.warn('SpeechRecognition not supported');
+    attachBtn.disabled = true;
+    attachBtn.title = 'المتصفح لا يدعم تحويل الصوت إلى نص';
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'ar';          // pick dialect: ar-SA / ar-EG / ar-LB ...
+  recognition.interimResults = true;   // show partial text while speaking
+  recognition.continuous = false;      // stop after one phrase
+
+  recognition.addEventListener('start', () => {
+    isRecording = true;
+    finalTranscript = '';
+    attachBtn.classList.add('recording');
+    attachBtn.title = 'يتم التسجيل... اضغط للإيقاف';
+    console.log('Speech: start');
+  });
+
+  recognition.addEventListener('end', () => {
+    isRecording = false;
+    attachBtn.classList.remove('recording');
+    attachBtn.title = 'تسجيل صوت';
+    console.log('Speech: end');
+
+    // if we got final text, send it like a normal message
+    const text = finalTranscript.trim();
+    if (text) {
+      input.value = text;   // show in input
+      // send.click();         // trigger your existing send logic
     }
   });
 
-  function appendMessage(text, role) {
-    const div = document.createElement('div');
-    div.className = 'message ' + role;
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  }
+  recognition.addEventListener('error', (e) => {
+    console.error('Speech error:', e);
+    isRecording = false;
+    attachBtn.classList.remove('recording');
+    attachBtn.title = 'تسجيل صوت';
+  });
 
-  // fixed selector logic
-  function replaceLastMessage(text) {
-    const messages = chat.querySelectorAll('.message.assistant');
-    if (messages.length > 0) {
-      const lastMsg = messages[messages.length - 1];
-      lastMsg.textContent = text;
-      lastMsg.className = 'message assistant';
+  recognition.addEventListener('result', (event) => {
+    let interim = '';
+    finalTranscript = '';
+
+    for (let i = 0; i < event.results.length; i++) {
+      const res = event.results[i];
+      if (res.isFinal) {
+        finalTranscript += res[0].transcript;
+      } else {
+        interim += res[0].transcript;
+      }
     }
-  }
+
+    const current = (finalTranscript + ' ' + interim).trim();
+
+    // show live transcription in the input box
+    input.value = current;
+  });
+
+  attachBtn.addEventListener('click', () => {
+    if (!recognition) return;
+
+    if (isRecording) {
+      // stop recording manually
+      recognition.stop();
+    } else {
+      // start a new recording
+      try {
+        recognition.start();
+      } catch (e) {
+        // Chrome throws if start() is called while it's already starting
+        console.warn('Could not start recognition:', e);
+      }
+    }
+  });
+})();
+
+  // Text-to-Speech
+  
 </script>
 
 
